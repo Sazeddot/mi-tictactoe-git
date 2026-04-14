@@ -14,8 +14,9 @@ dibujar_tablero()
 def jugar_turno(jugador):
     while True:
         try:
-            posicion = int(input(f"\nEs el turno de {jugador}. Elige posición (1-9): ")) - 1
-            if 0 <= posicion <= 8 and tablero[posicion] == " ":
+            # Usamos len(tablero) para que sea más profesional
+            posicion = int(input(f"\nEs el turno de {jugador}. Elige posición (1-{len(tablero)}): ")) - 1
+            if 0 <= posicion < len(tablero) and tablero[posicion] == " ":
                 tablero[posicion] = jugador
                 break
             else:
