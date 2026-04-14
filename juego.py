@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-import random  # <--- Nuevo: para que el bot elija
-
+import random
 TITULO_APP = "Tic-Tac-Toe vs Bot"
 AUTOR = "Sazeddot"
 AÑO = "2026"
@@ -16,6 +15,7 @@ class TicTacToe:
         self.jugador_actual = "X" # Tú siempre eres X
         self.tablero = [" " for _ in range(9)]
         self.botones = []
+        self.esperando_bot = False
         
         self.crear_menu()
         self.crear_interfaz()
@@ -38,19 +38,20 @@ class TicTacToe:
             self.botones.append(boton)
 
     def movimiento_jugador(self, i):
-        if self.tablero[i] == " " and self.jugador_actual == "X":
+        # Si la casilla está vacía Y no estamos esperando al bot
+        if self.tablero[i] == " " and not self.esperando_bot:
             self.realizar_movimiento(i, "X")
-            
-            # Si no has ganado tú y hay sitio, juega el bot
+
             if not self.verificar_ganador() and " " in self.tablero:
-                self.ventana.after(500, self.movimiento_bot) # El bot espera 0.5s para no ser instantáneo
+                self.esperando_bot = True  # Bloqueamos los clics del jugador
+                self.ventana.after(500, self.movimiento_bot)
 
     def movimiento_bot(self):
-        # El bot busca posiciones vacías y elige una al azar
         posiciones_libres = [i for i, x in enumerate(self.tablero) if x == " "]
         if posiciones_libres:
             eleccion = random.choice(posiciones_libres)
             self.realizar_movimiento(eleccion, "O")
+        self.esperando_bot = False  # El bot terminó, el jugador ya puede clickear
 
     def realizar_movimiento(self, i, marca):
         self.tablero[i] = marca
