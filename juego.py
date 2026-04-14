@@ -61,6 +61,10 @@ class TicTacToe:
 
     def iniciar_juego(self, vs_bot):
         self.modo_vs_bot = vs_bot
+        # Reiniciar estado de la partida
+        self.jugador_actual = "X"
+        self.esperando_bot = False
+
         self.limpiar_ventana()
         self.botones = []
         
