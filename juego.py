@@ -1,17 +1,42 @@
 import tkinter as tk
 from tkinter import messagebox
 
+# CONFIGURACIÓN / CONSTANTES (Fácil de cambiar en el futuro)
+TITULO_APP = "Tic-Tac-Toe Pro"
+AUTOR = "Sazeddot"
+AÑO = "2026"
+INFO_ADICIONAL = f"{TITULO_APP}\nCreado por {AUTOR}\n{AÑO}"
+
 class TicTacToe:
-    # Movimos las combinaciones aquí arriba (Constante de clase)
     COMBINACIONES = [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6)]
 
     def __init__(self):
         self.ventana = tk.Tk()
-        self.ventana.title("Tic-Tac-Toe Pro")
+        self.ventana.title(TITULO_APP)
         self.jugador_actual = "X"
         self.tablero = [" " for _ in range(9)]
         self.botones = []
+        
+        self.crear_menu()
         self.crear_interfaz()
+
+    def crear_menu(self):
+        barra_menu = tk.Menu(self.ventana)
+        self.ventana.config(menu=barra_menu)
+
+        menu_juego = tk.Menu(barra_menu, tearoff=0)
+        barra_menu.add_cascade(label="Juego", menu=menu_juego)
+        menu_juego.add_command(label="Nuevo Juego", command=self.reiniciar_juego)
+        menu_juego.add_separator()
+        # SUGERENCIA DE SOURCERY: Usamos destroy() en lugar de quit()
+        menu_juego.add_command(label="Salir", command=self.ventana.destroy)
+
+        menu_ayuda = tk.Menu(barra_menu, tearoff=0)
+        barra_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
+        menu_ayuda.add_command(label="Acerca de", command=self.mostrar_info)
+
+    def mostrar_info(self):
+        messagebox.showinfo("Acerca de", INFO_ADICIONAL)
 
     def crear_interfaz(self):
         for i in range(9):
@@ -22,7 +47,6 @@ class TicTacToe:
             self.botones.append(boton)
 
     def presionar_boton(self, i):
-        # Quitamos el verificar_ganador de aquí para no repetir
         if self.tablero[i] == " ":
             self.tablero[i] = self.jugador_actual
             self.botones[i].config(text=self.jugador_actual)
@@ -38,7 +62,6 @@ class TicTacToe:
                 self.jugador_actual = "O" if self.jugador_actual == "X" else "X"
 
     def verificar_ganador(self):
-        # Ahora usa la constante de la clase self.COMBINACIONES
         for a, b, c in self.COMBINACIONES:
             if self.tablero[a] == self.tablero[b] == self.tablero[c] != " ":
                 return self.tablero[a]
@@ -47,7 +70,7 @@ class TicTacToe:
     def reiniciar_juego(self):
         self.tablero = [" " for _ in range(9)]
         for boton in self.botones:
-            boton.config(text=" ")
+            boton.config(text=" ", bg="SystemButtonFace") # Resetea también el color
         self.jugador_actual = "X"
 
 if __name__ == "__main__":
