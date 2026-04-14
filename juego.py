@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 
 class TicTacToe:
+    # Movimos las combinaciones aquí arriba (Constante de clase)
+    COMBINACIONES = [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6)]
+
     def __init__(self):
         self.ventana = tk.Tk()
         self.ventana.title("Tic-Tac-Toe Pro")
@@ -11,7 +14,6 @@ class TicTacToe:
         self.crear_interfaz()
 
     def crear_interfaz(self):
-        # Creamos una cuadrícula de 3x3 botones
         for i in range(9):
             boton = tk.Button(self.ventana, text=" ", font=('Arial', 20, 'bold'), 
                               width=5, height=2,
@@ -20,7 +22,8 @@ class TicTacToe:
             self.botones.append(boton)
 
     def presionar_boton(self, i):
-        if self.tablero[i] == " " and not self.verificar_ganador():
+        # Quitamos el verificar_ganador de aquí para no repetir
+        if self.tablero[i] == " ":
             self.tablero[i] = self.jugador_actual
             self.botones[i].config(text=self.jugador_actual)
             
@@ -35,8 +38,8 @@ class TicTacToe:
                 self.jugador_actual = "O" if self.jugador_actual == "X" else "X"
 
     def verificar_ganador(self):
-        combinaciones = [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6)]
-        for a, b, c in combinaciones:
+        # Ahora usa la constante de la clase self.COMBINACIONES
+        for a, b, c in self.COMBINACIONES:
             if self.tablero[a] == self.tablero[b] == self.tablero[c] != " ":
                 return self.tablero[a]
         return None
