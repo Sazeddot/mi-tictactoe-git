@@ -10,3 +10,12 @@ def dibujar_tablero():
 
 print("--- BIENVENIDO AL TIC-TAC-TOE ---")
 dibujar_tablero()
+
+def jugar_turno(jugador):
+    print(f"\nEs el turno de {jugador}")
+    posicion = int(input("Elige una posición (1-9): ")) - 1
+    tablero[posicion] = jugador
+    dibujar_tablero()
+
+# Probamos un turno
+jugar_turno("X")
