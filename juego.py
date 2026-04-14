@@ -12,6 +12,7 @@ class TicTacToe:
     def __init__(self):
         self.ventana = tk.Tk()
         self.ventana.title(TITULO_APP)
+        self.ventana.configure(bg="#2c3e50")
         self.jugador_actual = "X" # Tú siempre eres X
         self.tablero = [" " for _ in range(9)]
         self.botones = []
@@ -32,8 +33,9 @@ class TicTacToe:
     def crear_interfaz(self):
         for i in range(9):
             boton = tk.Button(self.ventana, text=" ", font=('Arial', 20, 'bold'), 
-                              width=5, height=2,
-                              command=lambda i=i: self.movimiento_jugador(i))
+                  width=5, height=2,
+                  bg="#ecf0f1", activebackground="#bdc3c7", # Colores de fondo
+                  command=lambda i=i: self.movimiento_jugador(i))
             boton.grid(row=i//3, column=i%3)
             self.botones.append(boton)
 
