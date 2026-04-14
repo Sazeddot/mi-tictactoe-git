@@ -12,9 +12,17 @@ print("--- BIENVENIDO AL TIC-TAC-TOE ---")
 dibujar_tablero()
 
 def jugar_turno(jugador):
-    print(f"\nEs el turno de {jugador}")
-    posicion = int(input("Elige una posición (1-9): ")) - 1
-    tablero[posicion] = jugador
+    while True:
+        try:
+            posicion = int(input(f"\nEs el turno de {jugador}. Elige posición (1-9): ")) - 1
+            if 0 <= posicion <= 8 and tablero[posicion] == " ":
+                tablero[posicion] = jugador
+                break
+            else:
+                print("Esa posición no es válida o ya está ocupada. Prueba otra.")
+        except ValueError:
+            print("Por favor, introduce un número válido.")
+    
     dibujar_tablero()
 
 # Probamos un turno
