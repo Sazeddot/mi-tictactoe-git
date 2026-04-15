@@ -16,12 +16,15 @@ class TicTacToe:
 
     def __init__(self):
         # Inicializar Sonido
-        pygame.mixer.init()
+        self.sonido_click = None
         try:
-            self.sonido_click = pygame.mixer.Sound("click.wav")
+            pygame.mixer.init()
+            try:
+                self.sonido_click = pygame.mixer.Sound("click.wav")
+            except pygame.error:
+                print("⚠️ No se encontró click.wav, el juego funcionará sin sonido.")
         except pygame.error:
-            print("⚠️ No se encontró click.wav, el juego funcionará sin sonido.")
-            self.sonido_click = None
+            print("⚠️ No se pudo inicializar el sistema de sonido, el juego funcionará sin sonido.")
 
         self.ventana = tk.Tk()
         self.ventana.title("Tic-Tac-Toe Deluxe")
