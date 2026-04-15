@@ -87,17 +87,19 @@ class TicTacToe:
 
     def click_casilla(self, i):
         if self.tablero[i] == " " and not self.esperando_bot:
-            if self.sonido_click: self.sonido_click.play() # <--- SONIDO
+            if self.sonido_click: self.sonido_click.play()
             self.realizar_movimiento(i, self.jugador_actual)
             
-            # La lógica de ganador ya se maneja dentro de realizar_movimiento
-            if self.verificar_ganador() is None and " " in self.tablero:
+            # Solo cambiamos de turno si NADIE ha ganado todavía
+            ganador, _ = self.verificar_ganador()
+            if ganador is None and " " in self.tablero:
                 if self.modo_vs_bot:
                     self.esperando_bot = True
                     self.ventana.after(600, self.movimiento_bot)
                 else:
+                    # AQUÍ se cambia el turno:
                     self.jugador_actual = "O" if self.jugador_actual == "X" else "X"
-
+                    
     def movimiento_bot(self):
         libres = [i for i, x in enumerate(self.tablero) if x == " "]
         if libres:
@@ -111,11 +113,11 @@ class TicTacToe:
         color = COLOR_TEXTO_X if marca == "X" else COLOR_TEXTO_O
         self.botones[i].config(text=marca, fg=color)
         
-        # Obtenemos la combinación ganadora si existe
+        # OJO AQUÍ: Ahora recibimos dos valores
         ganador, indices_ganadores = self.verificar_ganador()
         
         if ganador:
-            self.efecto_parpadeo(indices_ganadores) # <--- EFECTO
+            self.efecto_parpadeo(indices_ganadores)
             messagebox.showinfo("¡Victoria!", f"Ganador: {ganador}")
             self.mostrar_pantalla_inicio()
         elif " " not in self.tablero:
@@ -140,10 +142,10 @@ class TicTacToe:
         self.ventana.update()
 
     def verificar_ganador(self):
-        # Ahora devuelve (Ganador, Indices_de_las_3_fichas)
         for a, b, c in self.COMBINACIONES:
-            if self.tablero[a] == self.tablero[b] == self.tablero[c] != " ":
-                return tablero[a], (a, b, c) # <--- Devolvemos los índices
+            # Comprobamos si las tres posiciones son iguales y no están vacías
+            if self.tablero[a] == self.tablero[b] == self.tablero[c] and self.tablero[a] != " ":
+                return self.tablero[a], (a, b, c)
         return None, None
 
 if __name__ == "__main__":
