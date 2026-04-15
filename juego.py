@@ -1,20 +1,31 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+import pygame  # <--- Nuevo: para el sonido
+import time    # <--- Nuevo: para el efecto de parpadeo
 
 # CONFIGURACIÓN ESTÉTICA
 COLOR_FONDO = "#2c3e50"
 COLOR_BOTON = "#ecf0f1"
 COLOR_TEXTO_X = "#e74c3c"
 COLOR_TEXTO_O = "#3498db"
+COLOR_GANADOR = "#2ecc71" # Verde neón
 
 class TicTacToe:
     COMBINACIONES = [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6)]
 
     def __init__(self):
+        # Inicializar Sonido
+        pygame.mixer.init()
+        try:
+            self.sonido_click = pygame.mixer.Sound("click.wav")
+        except pygame.error:
+            print("⚠️ No se encontró click.wav, el juego funcionará sin sonido.")
+            self.sonido_click = None
+
         self.ventana = tk.Tk()
         self.ventana.title("Tic-Tac-Toe Deluxe")
-        self.ventana.geometry("400x500")
+        self.ventana.geometry("400x550") # Un poco más alta
         self.ventana.configure(bg=COLOR_FONDO)
         
         self.modo_vs_bot = False
@@ -39,7 +50,7 @@ class TicTacToe:
         menu_ayuda.add_command(label="Acerca de", command=self.mostrar_info)
 
     def mostrar_info(self):
-        messagebox.showinfo("Acerca de", "Tic-Tac-Toe Deluxe\nVersión 2.0\nCreado por Sazeddot")
+        messagebox.showinfo("Acerca de", "Tic-Tac-Toe Deluxe\nVersión 3.0 (Sonidos y Efectos)\nCreado por Sazeddot")
 
     def limpiar_ventana(self):
         for widget in self.ventana.winfo_children():
@@ -61,10 +72,6 @@ class TicTacToe:
 
     def iniciar_juego(self, vs_bot):
         self.modo_vs_bot = vs_bot
-        # Reiniciar estado de la partida
-        self.jugador_actual = "X"
-        self.esperando_bot = False
-
         self.limpiar_ventana()
         self.botones = []
         
@@ -80,9 +87,11 @@ class TicTacToe:
 
     def click_casilla(self, i):
         if self.tablero[i] == " " and not self.esperando_bot:
+            if self.sonido_click: self.sonido_click.play() # <--- SONIDO
             self.realizar_movimiento(i, self.jugador_actual)
             
-            if not self.verificar_ganador() and " " in self.tablero:
+            # La lógica de ganador ya se maneja dentro de realizar_movimiento
+            if self.verificar_ganador() is None and " " in self.tablero:
                 if self.modo_vs_bot:
                     self.esperando_bot = True
                     self.ventana.after(600, self.movimiento_bot)
@@ -92,6 +101,7 @@ class TicTacToe:
     def movimiento_bot(self):
         libres = [i for i, x in enumerate(self.tablero) if x == " "]
         if libres:
+            if self.sonido_click: self.sonido_click.play() # <--- SONIDO BOT
             eleccion = random.choice(libres)
             self.realizar_movimiento(eleccion, "O")
         self.esperando_bot = False
@@ -101,19 +111,40 @@ class TicTacToe:
         color = COLOR_TEXTO_X if marca == "X" else COLOR_TEXTO_O
         self.botones[i].config(text=marca, fg=color)
         
-        ganador = self.verificar_ganador()
+        # Obtenemos la combinación ganadora si existe
+        ganador, indices_ganadores = self.verificar_ganador()
+        
         if ganador:
+            self.efecto_parpadeo(indices_ganadores) # <--- EFECTO
             messagebox.showinfo("¡Victoria!", f"Ganador: {ganador}")
             self.mostrar_pantalla_inicio()
         elif " " not in self.tablero:
             messagebox.showinfo("Empate", "¡Nadie gana!")
             self.mostrar_pantalla_inicio()
 
+    def efecto_parpadeo(self, indices):
+        # Lógica de parpadeo (Verde -> Blanco -> Verde...)
+        for _ in range(3):
+            for i in indices:
+                self.botones[i].config(bg=COLOR_GANADOR, fg="white")
+            self.ventana.update()
+            time.sleep(0.15)
+            for i in indices:
+                self.botones[i].config(bg=COLOR_BOTON, fg="black")
+            self.ventana.update()
+            time.sleep(0.15)
+        
+        # Dejarlo fijo en verde al final
+        for i in indices:
+             self.botones[i].config(bg=COLOR_GANADOR, fg="white")
+        self.ventana.update()
+
     def verificar_ganador(self):
+        # Ahora devuelve (Ganador, Indices_de_las_3_fichas)
         for a, b, c in self.COMBINACIONES:
             if self.tablero[a] == self.tablero[b] == self.tablero[c] != " ":
-                return self.tablero[a]
-        return None
+                return tablero[a], (a, b, c) # <--- Devolvemos los índices
+        return None, None
 
 if __name__ == "__main__":
     TicTacToe().ventana.mainloop()
